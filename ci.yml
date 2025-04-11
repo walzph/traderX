@@ -1,0 +1,98 @@
+schemaVersion: v0.2
+prepare:
+  steps:
+    - name: Install dependencies
+      command: nix-env -iA nixpkgs.jdk21_headless nixpkgs.gradle nixpkgs.python311
+        nixpkgs.nodejs_22 nixpkgs.dotnet-sdk_9
+    - name: ""
+      command: cd reference-data && npm install
+    - command: cd trade-feed && npm install
+    - command: cd web-front-end/react && npm install
+    - command: gradle build
+test:
+  steps: []
+run:
+  database:
+    steps:
+      - command: cd database && ./run.sh
+    plan: 21
+    replicas: 1
+    isPublic: true
+    network:
+      ports:
+        - port: 3000
+          isPublic: true
+        - port: 18082
+          isPublic: false
+        - port: 18083
+          isPublic: false
+      paths:
+        - port: 3000
+          path: /database
+          stripPath: true
+  reference-data:
+    steps:
+      - command: cd reference-data && npm run start
+    plan: 20
+    replicas: 1
+    isPublic: false
+  trade-feed:
+    steps:
+      - command: cd trade-feed && npm run start
+    plan: 20
+    replicas: 1
+    isPublic: true
+    network:
+      path: /trade-feed
+      stripPath: true
+  people-service:
+    steps:
+      - command: cd people-service/PeopleService.WebApi && dotnet run
+    plan: 20
+    replicas: 1
+    isPublic: true
+    network:
+      path: /People
+      stripPath: false
+  account-service:
+    steps:
+      - command: cd account-service && gradle bootRun
+    plan: 21
+    replicas: 1
+    isPublic: true
+    network:
+      path: /account
+      stripPath: false
+  position-service:
+    steps:
+      - command: cd position-service && gradle bootRun
+    plan: 21
+    replicas: 1
+    isPublic: true
+    network:
+      path: /positions
+      stripPath: false
+  trade-processor:
+    steps:
+      - command: cd trade-processor && gradle bootRun
+    plan: 21
+    replicas: 1
+    isPublic: false
+  trade-service:
+    steps:
+      - command: cd trade-service && gradle bootRun
+    plan: 21
+    replicas: 1
+    isPublic: true
+    network:
+      path: /trades
+      stripPath: false
+  web-front-end:
+    steps:
+      - command: cd web-front-end/angular && npm run start
+    plan: 20
+    replicas: 1
+    isPublic: true
+    network:
+      path: /
+      stripPath: false
