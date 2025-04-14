@@ -35,7 +35,10 @@ run:
       - command: cd reference-data && npm run start
     plan: 20
     replicas: 1
-    isPublic: false
+    isPublic: true
+    network:
+      path: /stocks
+      stripPath: false
   trade-feed:
     steps:
       - command: cd trade-feed && npm run start
@@ -43,8 +46,16 @@ run:
     replicas: 1
     isPublic: true
     network:
-      path: /trade-feed
-      stripPath: true
+      ports:
+        - port: 3000
+          isPublic: true
+      paths:
+        - port: 3000
+          path: /trade-feed
+          stripPath: true
+        - port: 3000
+          path: /socket.io
+          stripPath: true
   people-service:
     steps:
       - command: cd people-service/PeopleService.WebApi && dotnet run
@@ -70,14 +81,17 @@ run:
     replicas: 1
     isPublic: true
     network:
-      path: /positions
+      path: /trades
       stripPath: false
   trade-processor:
     steps:
       - command: cd trade-processor && gradle bootRun
     plan: 21
     replicas: 1
-    isPublic: false
+    isPublic: true
+    network:
+      path: /trade-processor
+      stripPath: false
   trade-service:
     steps:
       - command: cd trade-service && gradle bootRun
@@ -85,7 +99,7 @@ run:
     replicas: 1
     isPublic: true
     network:
-      path: /trades
+      path: /trade
       stripPath: false
   web-front-end:
     steps:
