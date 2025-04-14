@@ -5,9 +5,9 @@ prepare:
       command: nix-env -iA nixpkgs.jdk21_headless nixpkgs.gradle nixpkgs.python311
         nixpkgs.nodejs_22 nixpkgs.dotnet-sdk_9
     - name: ""
-      command: cd reference-data && npm install
+      command: cd reference-data && npm install && npm run build
     - command: cd trade-feed && npm install
-    - command: cd web-front-end/react && npm install
+    - command: cd web-front-end/angular && npm install && npm run build
     - command: gradle build
 test:
   steps: []
@@ -52,7 +52,7 @@ run:
     replicas: 1
     isPublic: true
     network:
-      path: /People
+      path: /people
       stripPath: false
   account-service:
     steps:
