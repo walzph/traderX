@@ -55,7 +55,7 @@ run:
           stripPath: true
         - port: 3000
           path: /socket.io
-          stripPath: true
+          stripPath: false
   people-service:
     steps:
       - command: cd people-service/PeopleService.WebApi && dotnet run
@@ -99,7 +99,7 @@ run:
     replicas: 1
     isPublic: true
     network:
-      path: /trade
+      path: /trade-service
       stripPath: false
   web-front-end:
     steps:
